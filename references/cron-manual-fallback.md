@@ -37,7 +37,7 @@ grep "cron_mode" ~/.hermes/config.yaml
 
 ```text
 批次 A: CoinGecko + AIHOT → 纯终端 curl
-批次 B: 腾讯新闻 → tencent-news-cli 多关键词
+批次 B: 腾讯新闻 → news-aggregator-skill fetch_news.py --source tencent
 批次 C: Twitter/X → web_search 广泛搜索账号名
 批次 D: 喷嚏图卦 + 泰伯早报 → fetch_dapenti.py + fetch_taibo.py
 ```

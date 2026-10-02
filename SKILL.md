@@ -1,7 +1,7 @@
 ---
 name: daily-intelligence
-description: 每日情报筛选系统。整合 news-aggregator-skill(44+源), aihot, ai-daily-news, tencent-news, Web3/区块链数据, Twitter/X关注人物，按主题（AI·Web3·区块链·比特币·科技·融资·金融·股票）筛选并生成日报。
-version: 1.5.1
+description: 每日情报筛选系统。整合 news-aggregator-skill(46+源，含 CoinDesk/Cointelegraph), aihot, CoinGecko, Twitter/X 68 账号原帖直拉（agent-reach + twitter-cli）, Reddit（rdt-cli），按主题（AI·Web3·区块链·比特币·科技·融资·金融·股票）筛选并生成日报。
+version: 1.6.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -25,7 +25,7 @@ metadata:
 | **Global** | Hacker News | news-aggregator-skill | ✅ |
 | | 36氪 | news-aggregator-skill | ✅ |
 | | 华尔街见闻 WallStreetCN | news-aggregator-skill | ✅ |
-| | 腾讯新闻 | tencent-news + news-aggregator-skill | ⚠️ 仅需科技相关 |
+| | 腾讯新闻 | news-aggregator-skill | ⚠️ 仅需科技相关 |
 | | 微博热搜 | news-aggregator-skill | ⚠️ 仅需科技/Web3 |
 | | V2EX | news-aggregator-skill | ✅ |
 | | Product Hunt | news-aggregator-skill | ✅ |
@@ -47,6 +47,8 @@ metadata:
 | | Dev.to | news-aggregator-skill | ✅ |
 | **Chinese** | 少数派 sspai | news-aggregator-skill | ✅ |
 | | InfoQ 中文 | news-aggregator-skill | ✅ |
+| **Crypto/宏观** | CoinDesk | news-aggregator-skill | ✅ BTC/宏观 |
+| | Cointelegraph | news-aggregator-skill | ✅ BTC/宏观 |
 | **International** | BBC / Guardian / Al Jazeera / France 24 / Reuters | news-aggregator-skill | ⚠️ 仅需科技/AI |
 
 ### 二、AI Daily News（远程API）
@@ -75,8 +77,69 @@ metadata:
 | Dario Amodei (Anthropic CEO) | Twitter/X | ✅ 已配置 |
 | @nvidia (NVIDIA官方) | Twitter/X | ✅ 已配置 |
 | @aleabitoreddit (白毛股神 Serenity) | Twitter/X | ✅ 已配置 — AI/半导体供应链分析 |
+| @JensenHuang (黄仁勋，NVIDIA CEO) | Twitter/X | ✅ 已配置 |
+| @demishassabis (Demis Hassabis，DeepMind CEO) | Twitter/X | ✅ 已配置 |
+| @ilyasut (Ilya Sutskever，SSI 创始人) | Twitter/X | ✅ 已配置 |
+| @karpathy (Andrej Karpathy) | Twitter/X | ✅ 已配置 — 技术解读/教学 |
+| @ylecun (Yann LeCun，Meta 首席 AI 科学家) | Twitter/X | ✅ 已配置 — 开源派 |
+| @pmarca (Marc Andreessen，a16z) | Twitter/X | ✅ 已配置 |
+| @drfeifei (李飞飞，World Labs) | Twitter/X | ✅ 已配置 — 空间智能 |
+| @dylan522p (Dylan Patel，SemiAnalysis) | Twitter/X | ✅ 已配置 — 芯片/AI 基建分析 |
+| @AndrewYNg (吴恩达) | Twitter/X | ✅ 已配置 |
+| @kaifulee (李开复，零一万物) | Twitter/X | ✅ 已配置 |
+| @GaryMarcus (Gary Marcus) | Twitter/X | ✅ 已配置 — AI 批评者 |
+| @emollick (Ethan Mollick，沃顿教授) | Twitter/X | ✅ 已配置 — AI 与工作 |
+| @gdb (Greg Brockman，OpenAI 总裁) | Twitter/X | ✅ 已配置 |
+| @sundarpichai (Sundar Pichai，Google CEO) | Twitter/X | ✅ 已配置 |
+| @satyanadella (Satya Nadella，微软 CEO) | Twitter/X | ✅ 已配置 |
+| @miramurati (Mira Murati，Thinking Machines CEO) | Twitter/X | ✅ 已配置 |
+| @JeffDean (Jeff Dean，Google 首席科学家) | Twitter/X | ✅ 已配置 |
+| @natolambert (Nathan Lambert) | Twitter/X | ✅ 已配置 — post-training/RLHF 研究 |
+| @vkhosla (Vinod Khosla) | Twitter/X | ✅ 已配置 — 风投 |
+| @OpenAI (OpenAI 官方) | Twitter/X | ✅ 已配置 |
+| @AnthropicAI (Anthropic 官方) | Twitter/X | ✅ 已配置 |
+| @GoogleDeepMind (Google DeepMind 官方) | Twitter/X | ✅ 已配置 |
+| @ESYudkowsky (Eliezer Yudkowsky) | Twitter/X | ✅ 已配置 — AI 安全派 |
+| @rowancheung (Rowan Cheung) | Twitter/X | ✅ 已配置 — The Rundown AI 日报 |
+| @fchollet (François Chollet) | Twitter/X | ✅ 已配置 — Keras 之父，ARC-AGI |
+| @geoffreyhinton (Geoffrey Hinton) | Twitter/X | ✅ 已配置 |
+| @ID_AA_Carmack (John Carmack) | Twitter/X | ✅ 已配置 |
+| @lilianweng (Lilian Weng) | Twitter/X | ✅ 已配置 — 前 OpenAI 研究员 |
+| @soumithchintala (Soumith Chintala) | Twitter/X | ✅ 已配置 — PyTorch 联合创始人 |
+| @goodfellow_ian (Ian Goodfellow) | Twitter/X | ✅ 已配置 — GAN 发明者 |
+| @dotey (dotey) | Twitter/X | ✅ 已配置 — 中文 AI 资讯核心源头 |
+| @WaytoAGI (WaytoAGI) | Twitter/X | ✅ 已配置 — AI 知识库/资讯 |
+| @Fenng (Fenng) | Twitter/X | ✅ 已配置 — 科技评论 |
+| @ClementDelangue (Clem Delangue) | Twitter/X | ✅ 已配置 — Hugging Face CEO |
+| @DrJimFan (Jim Fan) | Twitter/X | ✅ 已配置 — NVIDIA AI 科学家 |
+| @alexandr_wang (Alexandr Wang) | Twitter/X | ✅ 已配置 — Scale AI CEO |
+| @mustafasuleymn (Mustafa Suleyman) | Twitter/X | ✅ 已配置 — 微软 AI CEO |
+| @jackclarkSF (Jack Clark) | Twitter/X | ✅ 已配置 — Anthropic 联创 |
+| @DavidSHolz (David Holz) | Twitter/X | ✅ 已配置 — Midjourney 创始人 |
+| @paulg (Paul Graham) | Twitter/X | ✅ 已配置 |
+| @svlevine (Sergey Levine) | Twitter/X | ✅ 已配置 — 伯克利，机器人/RL |
+| @pabbeel (Pieter Abbeel) | Twitter/X | ✅ 已配置 — 伯克利机器人 |
+| @ykilcher (Yannic Kilcher) | Twitter/X | ✅ 已配置 — 论文解读 |
+| @web3houzi (web3houzi) | Twitter/X | ✅ 已配置 — AI 工具推荐 |
+| @gregisenberg (Greg Isenberg) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
+| @levelsio (Pieter Levels) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
+| @marclou (Marc Lou) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
+| @Hesamation (Hesam Esfahani) | Twitter/X | ✅ 已配置 — LLM/核心技术 |
+| @steipete (Peter Steinberger) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @corbin_braun (Corbin Braun) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @rileybrown (Riley Brown) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @EXM7777 (EXM) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @rryssf_ (rryssf) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @kloss_xyz (Kloss) | Twitter/X | ✅ 已配置 — 开发工具 |
+| @eptwts (Ept) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
+| @AmirMushich (Amir) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
+| @0xROAS (0xROAS) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
+| @godofprompt (Al god) | Twitter/X | ✅ 已配置 — 创意/内容 |
+| @vasuman (Vasuman) | Twitter/X | ✅ 已配置 — 创意/内容 |
+| @egeberkina (Eugenia) | Twitter/X | ✅ 已配置 — 创意/内容 |
+| @MengTo (Meng To) | Twitter/X | ✅ 已配置 — 创意/内容 |
+| @EMostaque (Emad Mostaque，Stability AI 创始人) | Twitter/X | ✅ 已配置 |
 | Reddit (AI/科技/金融子版块) | rdt-cli | ✅ 已登录 ActivityCorrect2434 |
-| 雪球 (热帖/行情) | agent-reach | ✅ 已配置 Cookie |
 | 喷嚏网/喷嚏图卦 | 喷嚏网公开网页 | ✅ fetch_dapenti.py（已去除结尾评论） |
 | 泰伯网/泰伯早报 | taibo.cn | ✅ fetch_taibo.py（商业航天/低空经济/时空智能/出海） |
 | 自动驾驶/智能网联合规动态 | 主管部门政策文件 | ✅ web_search（法规/标准/监管动态） |
@@ -106,11 +169,10 @@ metadata:
 
 1. **拉取所有数据源**
    - aihot API → 过去24h AI精选
-   - news-aggregator-skill fetch_news.py → 选关键源
-   - Twitter/X → `twitter user-posts @handle --json`（注意：`twitter user` 只返回资料不含推文）
-   - Reddit → `rdt search \"AI\" -n 3 --json` 搜索 AI/科技/股票主题
-   - 雪球 → Python `XueqiuChannel.get_hot_posts(limit=5)` 获取热帖
-   - tencent-news → `tencent-news-cli hot`
+   - news-aggregator-skill fetch_news.py → 选关键源（2026-10-02 起默认含 coindesk、cointelegraph，服务 BTC/宏观板块）
+   - Twitter/X → `twitter user-posts <handle> -n 4 --json`（注意：`twitter user` 只返回资料不含推文；`--json` 输出为 `{ok, data:[...]}` 信封，帖子链接拼 `https://x.com/{handle}/status/{id}`，链接必须从返回的 id 程序化取用，不要手拼）。本机 2026-10-02 起直拉打通（agent-reach GitHub 版 + twitter-cli，Cookie 已配，`twitter status` authenticated）。68 账号名单见上方自定义源表（67 个有公开 handle，Dario Amodei 无）
+   - Reddit → `rdt search "AI" -n 5 --json` 搜索 AI/科技/股票主题（本机 2026-10-02 打通，账号 ActivityCorrect2434；⚠️ 跑 rdt 前必须 `export no_proxy="localhost,127.0.0.1" NO_PROXY="localhost,127.0.0.1"`，否则本机 no_proxy 的括号 IPv6 会让 httpx 崩溃）
+   - tencent-news → news-aggregator-skill `fetch_news.py --source tencent`
    - CoinGecko → curl 公开 API
 
 2. **主题筛选**
@@ -131,7 +193,6 @@ metadata:
    - 喷嚏图卦源头链接统一为喷嚏图卦页面 URL，每条附注 `（来源：喷嚏网）`
    - Twitter/X 推文链接格式 `https://x.com/{screenName}/status/{id}`
    - Reddit 帖子链接格式 `https://reddit.com/r/{subreddit}/comments/{id}`
-   - 雪球热帖：使用雪球页面 URL，附注 `（来源：雪球）`
 
 4. **生成日报**，只展示匹配主题的内容，确保**每条都有可点击的来源链接**
 
@@ -324,7 +385,7 @@ LLM 驱动型 cron job（每日情报、arXiv、SPCX）可能因模型 provider 
 
 ```text
 批次 A: CoinGecko + AIHOT (curl)
-批次 B: Tencent News (tencent-news-cli)
+批次 B: Tencent News (news-aggregator-skill fetch_news.py --source tencent)
 批次 C: Twitter/X (web_search)
 批次 D: 喷嚏图卦 + 泰伯早报 (fetch_*.py)
 ```
@@ -376,3 +437,21 @@ LLM 驱动型 cron job（每日情报、arXiv、SPCX）可能因模型 provider 
 | 小宇宙 | `agent-reach install --channels xiaoyuzhou` | 无 | 无需 |
 | B站 | `agent-reach install --channels bilibili` | 无 | 需代理 |
 | LinkedIn | `agent-reach install --channels linkedin` | 需要登录 | 无需 |
+
+## 变更日志
+
+### v1.6.0（2026-10-02）
+
+本机（Muse VM）增量，均已实测：
+
+- **X 名单扩至 68 个**：新增 @JensenHuang（媒体交叉核验为本人）、@karpathy、@emollick 等 20 个；用户原清单里的 "@emollick（Emad）" 实为 Ethan Mollick，Emad Mostaque 按 @EMostaque 单列。
+- **X 直拉打通**：装 GitHub 版 `Panniantong/agent-reach`（注意 PyPI 同名包无 twitter 渠道）+ twitter-cli 0.8.5（pipx 路线失败后直装 venv）；`agent-reach configure twitter-cookies` 配置 Cookie，twitter 命令还需 `source ~/.agent-reach/twitter.env`（TWITTER_AUTH_TOKEN/CT0）。2026-10-02 实测 67 账号全拉、48h 内 49 个有动态共 154 条，日报 X 板块从此用原帖直链，不再公开搜索兜底。⚠️ 数据中心 IP + 主号 Cookie 有风控风险，建议小号；文档建议见 `references/channel-cookie-setup.md`。
+- **Reddit 打通**：rdt-cli 装入同一 venv，凭据按 manual 格式写 `~/.config/rdt-cli/credential.json`（600），账号 ActivityCorrect2434；`rdt search` 实测可用。坑：本机 `no_proxy` 含 `[::1]` 等括号 IPv6 会让 rdt 的 httpx 崩溃，跑前清成 `localhost,127.0.0.1`。
+- **新增聚合源**：news-aggregator-skill 新增 `coindesk` / `cointelegraph` 两源（RSS：coindesk.com/arc/outboundfeeds/rss/、cointelegraph.com/rss），日报默认清单包含，服务「₿ 比特币·宏观」板块。（该改动在 news-aggregator-skill 仓库内，本 skill 只登记。）
+- **公众号流水线验证**：md2wechat-lite AI 模式（autumn-warm）+ 封面，连续两日把「今日AI速览」推入「剑胆琴新」草稿箱并核验；个人订阅号仍需后台手动发表。
+
+### v1.5.2（2026-10-01）
+
+- **删除数据源**：雪球、tencent-news-cli（腾讯新闻统一走 `fetch_news.py --source tencent`）；cron 手动兜底文档已同步。
+- **装齐依赖**：clone 本 skill；补装 news-aggregator-skill（44+ 源）与 md2wechat-lite；AIHOT 公开 API 实测可用。
+- 首次全流程试跑成功，日报落盘。
