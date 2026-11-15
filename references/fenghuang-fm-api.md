@@ -105,5 +105,5 @@ print(''.join(s.text.strip() for s in segs))
 - 转写文字自动存档到第二大脑 Wiki
 
 ## 第二大脑存档
-- 路径：`~/wiki/queries/fenghuang-xiaoi-YYYY-MM-DD.md`
+- 路径：`~/wiki/20 queries/media/fenghuang-xiaoi-YYYY-MM-DD.md`
 - 格式：YAML frontmatter + 结构化摘要 + 完整转写文本

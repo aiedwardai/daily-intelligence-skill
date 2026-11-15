@@ -37,7 +37,7 @@ grep "cron_mode" ~/.hermes/config.yaml
 
 ```text
 批次 A: CoinGecko + AIHOT → 纯终端 curl
-批次 B: 腾讯新闻 → news-aggregator-skill fetch_news.py --source tencent
+批次 B: 腾讯新闻 → tencent-news-cli 多关键词
 批次 C: Twitter/X → web_search 广泛搜索账号名
 批次 D: 喷嚏图卦 + 泰伯早报 → fetch_dapenti.py + fetch_taibo.py
 ```
@@ -51,7 +51,7 @@ grep "cron_mode" ~/.hermes/config.yaml
 收集所有子代理输出后：
 1. 按 8 大主题（AI·Web3·区块链·比特币·科技·融资·金融·股票）分组筛选
 2. 每条带来源链接
-3. 用 `write_file` 写入 `~/wiki/queries/daily-intelligence-YYYY-MM-DD.md`
+3. 用 `write_file` 写入 `~/wiki/20 queries/intel/daily-intelligence-YYYY-MM-DD.md`
 4. 末尾附数据源状态表
 5. `cd ~/wiki && git add && git commit && git push`
 

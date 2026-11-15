@@ -46,6 +46,6 @@ transscribed: YYYY-MM-DD
 - **完整转写文本**必须保留在存档中，不可省略
 
 ## 注意事项
-- 存档路径：`~/wiki/queries/{slug}-{YYYY-MM-DD}.md`
+- 存档路径：`~/wiki/20 queries/media/{slug}-{YYYY-MM-DD}.md`
 - 存档后必须 `git add` + `git commit` + `git push`
 - 结构化摘要用于快速浏览，完整全文用于深度检索

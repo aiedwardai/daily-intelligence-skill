@@ -1,6 +1,6 @@
 # 自动驾驶合规每日情报工作流
 
-> 独立 cron job，每天自动执行。产出归档到 `~/wiki/queries/`。
+> 独立 cron job，每天自动执行。产出归档到 `~/wiki/20 queries/compliance/`。
 
 ## 执行步骤
 
@@ -19,11 +19,11 @@
 
 ### 2. 读取背景知识库
 
-`read_file(path='~/wiki/queries/automotive-compliance-solution.md')` — 获取现有法规体系、合规架构、技术标准等背景信息。
+`read_file(path='~/wiki/20 queries/compliance/automotive-compliance-solution.md')` — 获取现有法规体系、合规架构、技术标准等背景信息。
 
 ### 3. 对比昨日产出
 
-`read_file(path='~/wiki/queries/automotive-compliance-daily-YYYY-MM-DD.md')` — 读取上一期报告，避免重复，标注新进展。
+`read_file(path='~/wiki/20 queries/compliance/automotive-compliance-daily-YYYY-MM-DD.md')` — 读取上一期报告，避免重复，标注新进展。
 
 ### 4. 深度阅读关键文章
 
@@ -92,13 +92,13 @@ category: automotive-compliance
 ```bash
 # 保存到 wiki
 write_file(
-  path='~/wiki/queries/automotive-compliance-daily-YYYY-MM-DD.md',
+  path='~/wiki/20 queries/compliance/automotive-compliance-daily-YYYY-MM-DD.md',
   content=report_content
 )
 
 # git commit + push
 cd ~/wiki
-git add queries/automotive-compliance-daily-YYYY-MM-DD.md
+git add "20 queries/compliance/automotive-compliance-daily-YYYY-MM-DD.md"
 git commit -m "daily: 自动驾驶合规情报 YYYY-MM-DD — 本期核心事件"
 git push
 ```
@@ -125,4 +125,4 @@ git push
 
 ## 历史报告
 
-存档于 `~/wiki/queries/automotive-compliance-daily-*.md`，可通过 `search_files` 查询。
+存档于 `~/wiki/20 queries/compliance/automotive-compliance-daily-*.md`，可通过 `search_files` 查询。

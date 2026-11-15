@@ -36,7 +36,7 @@
 - **数据脚本**: `~/.hermes/scripts/xueqiu_tracker.py`
 - **包装器**: `~/.hermes/scripts/xueqiu_wrapper.sh`（tee stdout + 存入wiki + git push）
 - **Cron ID**: `4b78f05e7441`，每天 07:00，no_agent 模式
-- **Wiki路径**: `~/wiki/queries/xueqiu-tracker-YYYY-MM-DD.md`
+- **Wiki路径**: `~/wiki/20 queries/markets/xueqiu-tracker-YYYY-MM-DD.md`
 
 ## 未来解决方案（如需稳定抓取）
 

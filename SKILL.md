@@ -1,457 +1,509 @@
 ---
-name: daily-intelligence
-description: 每日情报筛选系统。整合 news-aggregator-skill(46+源，含 CoinDesk/Cointelegraph), aihot, CoinGecko, Twitter/X 68 账号原帖直拉（agent-reach + twitter-cli）, Reddit（rdt-cli），按主题（AI·Web3·区块链·比特币·科技·融资·金融·股票）筛选并生成日报。
-version: 1.6.0
-author: Hermes Agent
-license: MIT
-metadata:
-  hermes:
-    tags: [news, daily, intelligence, filter, ai, web3]
-    related_skills: [aihot, news-aggregator-skill, ai-daily-news, tencent-news, second-brain]
+name: ai-signal-intelligence
+description: AI信号情报引擎：8层信源采集、7维信号评分、三重影响分析与行动建议，生成可决策日报。
+aliases: [daily-intelligence]
+version: 3.2
+author: Edward Dai
+tags: [ai, signal, intelligence, analysis, actionable, trend, research]
+related_skills: [aihot, second-brain, source-gathering, arxiv, wordpress-publish]
 ---
 
-# 每日情报筛选系统（Daily Intelligence）
+# AI Signal Intelligence v3.2 — 信号情报引擎
 
-## 数据源全景
+> 不是新闻聚合器，而是企业级 AI Signal Intelligence Engine。
+>
+> 目标：Signal → Insight → Decision → Action
 
-本 Skill 整合以下 News Skill：**aihot**（AI 中文资讯）、**ai-daily-news**（全球 AI 新闻）、**news-aggregator-skill**（44+ 源全能聚合器）、**tencent-news**（腾讯新闻 7×24 资讯），外加 Web3/区块链专有数据源。
+---
 
-此外，本 Skill 可委托 `source-gathering` skill 执行多维度新闻素材收集（web_search 采集 → 原始池 → 压缩精选 → 推荐主线），以获得更结构化的素材池。
+## Core Principle
 
-### 一、聚合新闻源（整合 news-aggregator-skill + aihot + ai-daily-news + tencent-news）
+不要输出"今天发生了什么"。
+而要输出"今天哪些事情会改变未来"。
 
-| 类别 | 源名 | 来源 Skill | 是否关注 |
-|------|------|-----------|---------|
-| **Global** | Hacker News | news-aggregator-skill | ✅ |
-| | 36氪 | news-aggregator-skill | ✅ |
-| | 华尔街见闻 WallStreetCN | news-aggregator-skill | ✅ |
-| | 腾讯新闻 | news-aggregator-skill | ⚠️ 仅需科技相关 |
-| | 微博热搜 | news-aggregator-skill | ⚠️ 仅需科技/Web3 |
-| | V2EX | news-aggregator-skill | ✅ |
-| | Product Hunt | news-aggregator-skill | ✅ |
-| | GitHub Trending | news-aggregator-skill | ✅ |
-| **AI Curated** | AIHOT (aihot.virxact.com) | aihot | ✅ |
-| | TLDR AI (英文日刊) | news-aggregator-skill | ✅ |
-| | Import AI (Jack Clark 周刊) | news-aggregator-skill | ✅ |
-| | AI Daily News 远程数据集 | ai-daily-news | ✅ |
-| **AI/Tech** | Hugging Face Papers | news-aggregator-skill | ✅ |
-| | arXiv (cs.AI/cs.CL/cs.LG) | news-aggregator-skill | ✅ |
-| | Ben's Bites | news-aggregator-skill | ✅ |
-| | Interconnects | news-aggregator-skill | ✅ |
-| | One Useful Thing | news-aggregator-skill | ✅ |
-| | ChinAI | news-aggregator-skill | ✅ |
-| | Memia | news-aggregator-skill | ✅ |
-| | AI to ROI | news-aggregator-skill | ✅ |
-| | KDnuggets | news-aggregator-skill | ✅ |
-| **Tech** | Lobsters | news-aggregator-skill | ✅ |
-| | Dev.to | news-aggregator-skill | ✅ |
-| **Chinese** | 少数派 sspai | news-aggregator-skill | ✅ |
-| | InfoQ 中文 | news-aggregator-skill | ✅ |
-| **Crypto/宏观** | CoinDesk | news-aggregator-skill | ✅ BTC/宏观 |
-| | Cointelegraph | news-aggregator-skill | ✅ BTC/宏观 |
-| **International** | BBC / Guardian / Al Jazeera / France 24 / Reuters | news-aggregator-skill | ⚠️ 仅需科技/AI |
+每条情报必须经过以下 8 步处理流水线，**任何新闻未经评分，不允许直接进入日报**：
 
-### 二、AI Daily News（远程API）
-来自 `ai-daily-news` skill 的远程数据集，覆盖全球AI新闻。
+```
+Source Collection
+      │
+      ▼
+Deduplication
+      │
+      ▼
+Topic Clustering
+      │
+      ▼
+Cross Verification
+      │
+      ▼
+Signal Scoring
+      │
+      ▼
+Business Impact
+      │
+      ▼
+Action Recommendation
+      │
+      ▼
+Daily Intelligence
+```
 
-### 三、Web3/区块链专属数据源（来自 Web3 PDF）
-| 源名 | 用途 | 类别 |
-|------|------|------|
-| Coinglass | BTC现货ETF资金流 | 区块链/比特币 |
-| CoinGecko | 加密货币实时报价 | 区块链/比特币 |
-| CoinMarketCap | 交易所交易量排名 | 区块链/金融 |
-| Foresight News | Web3/区块链新闻 | Web3/区块链 |
-| Whale Alert | 巨鲸链上转账监控 | 区块链/比特币 |
-| Grayscale GBTC | 灰度BTC持仓 | 区块链/比特币 |
-| iShares IBIT | BTC ETF持仓 | 区块链/比特币 |
-| Fidelity FBTC | BTC ETF持仓 | 区块链/比特币 |
-| VanEck HODL | BTC ETF持仓 | 区块链/比特币 |
-| Hey Apollo | BTC ETF数据 | 区块链/比特币 |
+---
 
-### 三、用户自定义源
-| 源名 | 类型 | 可获取性 |
-|------|------|----------|
-| @elonmusk (马斯克) | Twitter/X | ✅ 已配置 |
-| @realDonaldTrump (特朗普) | Twitter/X | ✅ 已配置 |
-| @sama (Sam Altman) | Twitter/X | ✅ 已配置 |
-| Dario Amodei (Anthropic CEO) | Twitter/X | ✅ 已配置 |
-| @nvidia (NVIDIA官方) | Twitter/X | ✅ 已配置 |
-| @aleabitoreddit (白毛股神 Serenity) | Twitter/X | ✅ 已配置 — AI/半导体供应链分析 |
-| @JensenHuang (黄仁勋，NVIDIA CEO) | Twitter/X | ✅ 已配置 |
-| @demishassabis (Demis Hassabis，DeepMind CEO) | Twitter/X | ✅ 已配置 |
-| @ilyasut (Ilya Sutskever，SSI 创始人) | Twitter/X | ✅ 已配置 |
-| @karpathy (Andrej Karpathy) | Twitter/X | ✅ 已配置 — 技术解读/教学 |
-| @ylecun (Yann LeCun，Meta 首席 AI 科学家) | Twitter/X | ✅ 已配置 — 开源派 |
-| @pmarca (Marc Andreessen，a16z) | Twitter/X | ✅ 已配置 |
-| @drfeifei (李飞飞，World Labs) | Twitter/X | ✅ 已配置 — 空间智能 |
-| @dylan522p (Dylan Patel，SemiAnalysis) | Twitter/X | ✅ 已配置 — 芯片/AI 基建分析 |
-| @AndrewYNg (吴恩达) | Twitter/X | ✅ 已配置 |
-| @kaifulee (李开复，零一万物) | Twitter/X | ✅ 已配置 |
-| @GaryMarcus (Gary Marcus) | Twitter/X | ✅ 已配置 — AI 批评者 |
-| @emollick (Ethan Mollick，沃顿教授) | Twitter/X | ✅ 已配置 — AI 与工作 |
-| @gdb (Greg Brockman，OpenAI 总裁) | Twitter/X | ✅ 已配置 |
-| @sundarpichai (Sundar Pichai，Google CEO) | Twitter/X | ✅ 已配置 |
-| @satyanadella (Satya Nadella，微软 CEO) | Twitter/X | ✅ 已配置 |
-| @miramurati (Mira Murati，Thinking Machines CEO) | Twitter/X | ✅ 已配置 |
-| @JeffDean (Jeff Dean，Google 首席科学家) | Twitter/X | ✅ 已配置 |
-| @natolambert (Nathan Lambert) | Twitter/X | ✅ 已配置 — post-training/RLHF 研究 |
-| @vkhosla (Vinod Khosla) | Twitter/X | ✅ 已配置 — 风投 |
-| @OpenAI (OpenAI 官方) | Twitter/X | ✅ 已配置 |
-| @AnthropicAI (Anthropic 官方) | Twitter/X | ✅ 已配置 |
-| @GoogleDeepMind (Google DeepMind 官方) | Twitter/X | ✅ 已配置 |
-| @ESYudkowsky (Eliezer Yudkowsky) | Twitter/X | ✅ 已配置 — AI 安全派 |
-| @rowancheung (Rowan Cheung) | Twitter/X | ✅ 已配置 — The Rundown AI 日报 |
-| @fchollet (François Chollet) | Twitter/X | ✅ 已配置 — Keras 之父，ARC-AGI |
-| @geoffreyhinton (Geoffrey Hinton) | Twitter/X | ✅ 已配置 |
-| @ID_AA_Carmack (John Carmack) | Twitter/X | ✅ 已配置 |
-| @lilianweng (Lilian Weng) | Twitter/X | ✅ 已配置 — 前 OpenAI 研究员 |
-| @soumithchintala (Soumith Chintala) | Twitter/X | ✅ 已配置 — PyTorch 联合创始人 |
-| @goodfellow_ian (Ian Goodfellow) | Twitter/X | ✅ 已配置 — GAN 发明者 |
-| @dotey (dotey) | Twitter/X | ✅ 已配置 — 中文 AI 资讯核心源头 |
-| @WaytoAGI (WaytoAGI) | Twitter/X | ✅ 已配置 — AI 知识库/资讯 |
-| @Fenng (Fenng) | Twitter/X | ✅ 已配置 — 科技评论 |
-| @ClementDelangue (Clem Delangue) | Twitter/X | ✅ 已配置 — Hugging Face CEO |
-| @DrJimFan (Jim Fan) | Twitter/X | ✅ 已配置 — NVIDIA AI 科学家 |
-| @alexandr_wang (Alexandr Wang) | Twitter/X | ✅ 已配置 — Scale AI CEO |
-| @mustafasuleymn (Mustafa Suleyman) | Twitter/X | ✅ 已配置 — 微软 AI CEO |
-| @jackclarkSF (Jack Clark) | Twitter/X | ✅ 已配置 — Anthropic 联创 |
-| @DavidSHolz (David Holz) | Twitter/X | ✅ 已配置 — Midjourney 创始人 |
-| @paulg (Paul Graham) | Twitter/X | ✅ 已配置 |
-| @svlevine (Sergey Levine) | Twitter/X | ✅ 已配置 — 伯克利，机器人/RL |
-| @pabbeel (Pieter Abbeel) | Twitter/X | ✅ 已配置 — 伯克利机器人 |
-| @ykilcher (Yannic Kilcher) | Twitter/X | ✅ 已配置 — 论文解读 |
-| @web3houzi (web3houzi) | Twitter/X | ✅ 已配置 — AI 工具推荐 |
-| @gregisenberg (Greg Isenberg) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
-| @levelsio (Pieter Levels) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
-| @marclou (Marc Lou) | Twitter/X | ✅ 已配置 — 独立开发/创业 |
-| @Hesamation (Hesam Esfahani) | Twitter/X | ✅ 已配置 — LLM/核心技术 |
-| @steipete (Peter Steinberger) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @corbin_braun (Corbin Braun) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @rileybrown (Riley Brown) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @EXM7777 (EXM) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @rryssf_ (rryssf) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @kloss_xyz (Kloss) | Twitter/X | ✅ 已配置 — 开发工具 |
-| @eptwts (Ept) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
-| @AmirMushich (Amir) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
-| @0xROAS (0xROAS) | Twitter/X | ✅ 已配置 — AI 变现/营销 |
-| @godofprompt (Al god) | Twitter/X | ✅ 已配置 — 创意/内容 |
-| @vasuman (Vasuman) | Twitter/X | ✅ 已配置 — 创意/内容 |
-| @egeberkina (Eugenia) | Twitter/X | ✅ 已配置 — 创意/内容 |
-| @MengTo (Meng To) | Twitter/X | ✅ 已配置 — 创意/内容 |
-| @EMostaque (Emad Mostaque，Stability AI 创始人) | Twitter/X | ✅ 已配置 |
-| Reddit (AI/科技/金融子版块) | rdt-cli | ✅ 已登录 ActivityCorrect2434 |
-| 喷嚏网/喷嚏图卦 | 喷嚏网公开网页 | ✅ fetch_dapenti.py（已去除结尾评论） |
-| 泰伯网/泰伯早报 | taibo.cn | ✅ fetch_taibo.py（商业航天/低空经济/时空智能/出海） |
-| 自动驾驶/智能网联合规动态 | 主管部门政策文件 | ✅ web_search（法规/标准/监管动态） |
-| 猫笔刀（公众号） | 财经/股市 | ❌ 微信封闭生态 |
-| 孟岩的区块链思考（公众号） | 区块链 | ❌ 微信封闭生态 |
-| 金岩石（抖音） | 财经观点 | ❌ 抖音封闭生态 |
-| 李孔越（抖音） | 财经观点 | ❌ 抖音封闭生态 |
+## 八大信息层
 
-## 主题筛选规则
+### Layer 1: Top People（核心人物追踪）
 
-只保留以下主题的内容，其他一概过滤：
+每日追踪以下 X（Twitter）账号，发现行业趋势、技术方向、未来信号：
 
-| 主题 | 关键词（用于过滤） |
-|------|-------------------|
-| **AI** | AI, 人工智能, LLM, GPT, Claude, OpenAI, Anthropic, DeepSeek, 大模型, 机器学习, Agent, 智能体, 推理, RAG, 神经网络, GenAI, 生成式AI, Sam Altman, Dario Amodei |
-| **Web3** | Web3, 去中心化, DeFi, NFT, 元宇宙, DAO, 公链, Layer2, 跨链 |
-| **区块链** | 区块链, 链上, 智能合约, 矿工, 挖矿, 哈希, 节点, EVM, 共识机制, PoS, PoW |
-| **比特币** | 比特币, BTC, 比特币ETF, 比特币现货ETF, GBTC, 减半, 比特币价格, 比特币挖矿, Satoshi, Ordinals, 铭文 |
-| **科技（大类）** | 科技, 技术, 创新, 创业, 开源, 代码, 编程, 芯片, GPU, NVIDIA, 半导体, 数据中心, 云计算, 5G/6G, 卫星, 航天, 低空经济, SpaceX, 机器人, 自动驾驶 |
-| **融资** | 融资, 投资, 融资轮, 天使轮, A轮, B轮, VC, 风投, 募资, 众筹, 资本, 估值, IPO, 并购, 收购 |
-| **金融** | 金融, 银行, 证券, 基金, 债券, 利率, 美联储, 通胀, 货币政策, 监管, 合规, 央行 |
-| **股票** | 股票, 股市, 港股, 美股, A股, 大盘, 指数, Nvidia, 特斯拉, 苹果, Microsoft, Google, 财报, 股息, 回购 |
+```
+@elonmusk             — 马斯克（xAI/Tesla/SpaceX）
+@sama                 — Sam Altman（OpenAI CEO）
+@demishassabis        — Demis Hassabis（Google DeepMind CEO）
+@karpathy             — Andrej Karpathy
+@ylecun               — Yann LeCun（Meta AI 首席）
+@JeffDean             — Jeff Dean（Google DeepMind）
+@darioamodei          — Dario Amodei（Anthropic CEO）
+@gdb                  — Greg Brockman（OpenAI 联合创始人）
+@natfriedman          — Nat Friedman（GitHub 前 CEO）
+@eladgil              — Elad Gil（AI 投资人）
+@AndrewYNg            — Andrew Ng（DeepLearning.AI）
+@emollick             — Ethan Mollick（AI 研究）
+```
+
+### Layer 2: AI Labs（AI 实验室追踪）
+
+每日追踪实验室官方账号：
+
+```
+@OpenAI            — OpenAI
+@AnthropicAI       — Anthropic
+@GoogleDeepMind    — Google DeepMind
+@xAI               — xAI（马斯克）
+@nvidia            — NVIDIA
+@deepseek_ai       — DeepSeek
+@Alibaba_Qwen      — 阿里通义千问
+@MoonshotAI        — 月之暗面
+@MiniMax__AI       — MiniMax
+@ZhipuAI           — 智谱AI
+@MistralAI         — Mistral
+@Cohere            — Cohere
+```
+
+### Layer 3: Open Source（开源生态追踪）
+
+```
+@huggingface      — Hugging Face
+@LangChainAI      — LangChain
+@llama_index      — LlamaIndex
+@ollama           — Ollama
+@vllm_project     — vLLM
+@modal_labs       — Modal
+@replicate        — Replicate
+```
+
+### Layer 4: GitHub（GitHub 深度分析）
+
+每日扫描 GitHub Trending，重点分析：AI/LLM/Agent/MCP/Coding Agent/RAG/Workflow/Browser Use/OpenManus/Claude Code/Codex/OpenAI SDK/Anthropic SDK
+
+关注：New Release、Trending Repo、Star 增长最快、Issue 热度、PR 热度、Breaking Project
+
+### Layer 5: Research（学术研究追踪）
+
+每日扫描 arXiv、Papers with Code、Semantic Scholar
+关键词：LLM/Agent/Reasoning/Inference/Multimodal/RL/Diffusion/Memory/Evaluation/Tool Use
+
+### Layer 6: Official Blogs（官方博客追踪）
+
+OpenAI Blog / Anthropic Blog / Google DeepMind Blog / Meta AI Blog / Microsoft Research / NVIDIA Blog / AWS AI / Azure AI / Cloudflare Blog
+
+### Layer 7: Policy（政策法规追踪）
+
+美国：White House / NIST / FCC / SEC
+欧盟：EU AI Office
+中国：国家数据局 / 工信部 / 网信办
+
+### Layer 8: Capital（资本流向追踪）
+
+VC：a16z / Sequoia / Benchmark / Accel / Lightspeed / Y Combinator
+投行：ARK Invest / Morgan Stanley / Goldman Sachs
+
+---
+
+## Signal Score 评分体系
+
+### 评分公式
+
+每条事件必须计算 Signal Score（0-100）：
+
+```
+Signal Score = Importance × 25%
+            + Credibility × 20%
+            + Business Impact × 20%
+            + Technical Impact × 15%
+            + Novelty × 10%
+            + Market Impact × 5%
+            + Propagation × 5%
+```
+
+### Signal Level
+
+| Signal Score | 等级 | 标签 | 含义 |
+|:-----------:|:----:|:----:|------|
+| 90-100 | ★★★★★ | **S+** | 行业拐点，必须立即阅读 |
+| 80-89 | ★★★★★ | **S** | 重大行业事件 |
+| 70-79 | ★★★★☆ | **A** | 重点关注 |
+| 60-69 | ★★★☆☆ | **B** | 值得了解 |
+| 40-59 | ★★☆☆☆ | **C** | 一般信息 |
+| 0-39 | ★☆☆☆☆ | Ignore | 日报默认忽略 |
+
+---
+
+## Confidence Score（可信度评分）
+
+每条事件必须计算可信度（0-100）：
+
+| 分数 | 条件 |
+|:----:|------|
+| 95+ | 官方确认（官方 Blog/Documentation/Release） |
+| 80+ | 多个可信来源交叉验证 |
+| 60+ | 单一可信来源 |
+| 40- | 传闻/未证实 |
+
+**判定依据：**
+- 是否来自官方
+- 是否来自多个来源
+- 是否存在 GitHub 项目
+- 是否存在 Blog 文章
+- 是否存在论文
+- 是否存在 Documentation
+
+---
+
+## Business Impact（业务影响分析）
+
+每条事件必须分析：
+
+**哪些企业受到影响？**
+**哪些行业受到影响？**
+**哪些岗位受到影响？**
+
+**是否影响：**
+企业 AI / Agent / 云计算 / 芯片 / SaaS / 办公 / 金融 / 制造 / 汽车 / 医疗 / 教育
+
+**影响等级：**
+Critical / High / Medium / Low / None
+
+---
+
+## Technical Impact（技术影响分析）
+
+分析是否影响以下技术领域（可多选）：
+
+```
+LLM / Reasoning / Context / Inference / Memory
+Tool Calling / Agent / MCP / Coding / RAG
+Browser Use / Multimodal / Evaluation / Fine-tuning
+```
+
+---
+
+## Market Impact（市场影响分析）
+
+分析是否影响以下公司/市场（可多选）：
+
+```
+GPU / Cloud / OpenAI / Anthropic / Google / Meta
+NVIDIA / AMD / TSMC / Microsoft / Amazon / Apple / Tesla
+AI 创业公司
+```
+
+若影响上市公司，列出公司名称。
+
+---
+
+## Action Recommendation（行动建议）
+
+每条 S/A 级事件必须输出 Action Recommendation：
+
+| 建议 | 含义 |
+|:----:|------|
+| **Monitor** | 继续观察，无需立即行动 |
+| **Research** | 值得深入研究 |
+| **Experiment** | 建议团队测试/试用 |
+| **Upgrade** | 建议升级现有方案 |
+| **Prepare** | 建议提前准备/布局 |
+| **Ignore** | 无需投入时间 |
+
+**示例：**
+- OpenAI 发布新 API → **Experiment / Upgrade**
+- Karpathy 发布 Agent 新框架 → **Research / Experiment**
+- White House 发布 AI 法案 → **Prepare / Review Compliance**
+
+---
+
+## Trend Detection（趋势检测）
+
+不仅分析单条新闻，还必须分析最近 7 天 / 30 天 / 90 天是否形成趋势。
+
+**示例：** 如果 OpenAI + Anthropic + Google 都在强化 Reasoning，则输出：
+> **Trend：** Reasoning 已进入行业竞争核心。
+
+而不是仅展示三条独立新闻。
+
+---
+
+## Event Correlation（事件关联）
+
+自动关联多源同一事件。如果 Twitter + GitHub + Paper + Blog + Documentation + Release + Funding + Policy 同时讨论同一事件，合并为**一个事件**，不要重复输出。
+
+---
+
+## Actionable Intelligence（可执行情报）
+
+日报不是 Information，而是 Actionable Intelligence。
+
+每天必须输出 **Top 5 Action Items**，例如：
+- 建议立即体验某模型
+- 建议关注某 GitHub 项目
+- 建议阅读某论文
+- 建议关注某法规
+- 建议准备企业升级
+
+---
+
+## Daily Output（日报格式）
+
+```
+# Hermes AI Daily Intelligence
+Date: YYYY-MM-DD
+
+---
+
+## Executive Summary
+今日核心判断（2-3 句话）
+
+---
+
+## Today's Top 10
+1. [S+] 事件标题 — Signal Score
+2. [S] 事件标题 — Signal Score
+...
+
+---
+
+## S Level
+真正改变行业的事件，每条含：
+- Signal Score / Confidence Score
+- Business Impact / Technical Impact / Market Impact
+- Action Recommendation
+- 来源链接
+
+---
+
+## A Level
+值得重点关注，每条含：
+- Signal Score / Action Recommendation
+- 来源链接
+
+---
+
+## B Level
+行业动态
+
+---
+
+## Trend Analysis
+7 天 / 30 天 / 90 天趋势识别
+
+---
+
+## Business Impact
+今日哪些企业/行业/岗位受影响最大？
+
+---
+
+## Technical Impact
+今日哪些技术领域出现突破或变化？
+
+---
+
+## Market Impact
+今日资本市场/上市公司值得关注的变化？
+
+---
+
+## Policy Update
+法规/监管动态
+
+---
+
+## Open Source Update
+GitHub Trending / 新发布 / 新框架
+
+---
+
+## Research Update
+今日论文 / 重要突破
+
+---
+
+## Top GitHub
+今日最值得关注的 3 个开源项目
+
+---
+
+## Top Papers
+今日最值得阅读的 3 篇论文
+
+---
+
+## Top 5 Action Items
+1. [Action] 事项描述
+2. [Action] 事项描述
+...
+
+---
+
+## Tomorrow Watchlist
+预测未来 24 小时 / 72 小时 / 一周最值得关注的事件：
+- 明天：
+- 本周：
+- 提前布局：
+```
+
+---
 
 ## 工作流
 
 ### 每日情报汇总执行流程
 
-1. **拉取所有数据源**
-   - aihot API → 过去24h AI精选
-   - news-aggregator-skill fetch_news.py → 选关键源（2026-10-02 起默认含 coindesk、cointelegraph，服务 BTC/宏观板块）
-   - Twitter/X → `twitter user-posts <handle> -n 4 --json`（注意：`twitter user` 只返回资料不含推文；`--json` 输出为 `{ok, data:[...]}` 信封，帖子链接拼 `https://x.com/{handle}/status/{id}`，链接必须从返回的 id 程序化取用，不要手拼）。本机 2026-10-02 起直拉打通（agent-reach GitHub 版 + twitter-cli，Cookie 已配，`twitter status` authenticated）。68 账号名单见上方自定义源表（67 个有公开 handle，Dario Amodei 无）
-   - Reddit → `rdt search "AI" -n 5 --json` 搜索 AI/科技/股票主题（本机 2026-10-02 打通，账号 ActivityCorrect2434；⚠️ 跑 rdt 前必须 `export no_proxy="localhost,127.0.0.1" NO_PROXY="localhost,127.0.0.1"`，否则本机 no_proxy 的括号 IPv6 会让 httpx 崩溃）
-   - tencent-news → news-aggregator-skill `fetch_news.py --source tencent`
-   - CoinGecko → curl 公开 API
+**执行时间：** 每天 18:00（cron: `0 18 * * *`）
 
-2. **主题筛选**
-   对每条内容，按上述「主题关键词」规则匹配。一条内容可能匹配多个主题。
+**Step 1: 并行拉取 8 层数据源**
 
-3. **按主题分组输出，每条内容必带来源链接**
-   ```markdown
-   🤖 AI · ⛓️ Web3/区块链 · ₿ 比特币 · 🔬 科技 · 💰 融资 · 📊 金融 · 📈 股票
-   ```
-   **每条新闻的格式规范：**
-   ```markdown
-   **标题**
-   摘要内容...
-   🔗 [来源名称](原始链接)
-   ```
-   - tencent-news 搜出来的每条自带链接，直接保留
-   - 泰伯早报源头链接统一为 `https://www.taibo.cn/p/{id}`，每条附注 `（来源：泰伯网）`
-   - 喷嚏图卦源头链接统一为喷嚏图卦页面 URL，每条附注 `（来源：喷嚏网）`
-   - Twitter/X 推文链接格式 `https://x.com/{screenName}/status/{id}`
-   - Reddit 帖子链接格式 `https://reddit.com/r/{subreddit}/comments/{id}`
+| 批次 | 层 | 采集方式 | 预估耗时 |
+|:----:|:---|---------|:--------:|
+| A | Layer 1-2: Top People + AI Labs | web_search 各账号最新推文 | 15s |
+| B | Layer 3: Open Source | web_search 各项目动态 | 10s |
+| C | Layer 4: GitHub | web_search GitHub Trending (中英文) | 10s |
+| D | Layer 5: Research | web_search arXiv + Papers with Code | 10s |
+| E | Layer 6: Official Blogs | web_search 定向搜索各博客 | 10s |
+| F | Layer 7: Policy | web_search 政策法规关键词 | 10s |
+| G | Layer 8: Capital | web_search 融资/IPO 动态 | 8s |
+| H | 补充源 | AIHOT API / CoinGecko / 喷嚏图卦 / 泰伯早报 | 15s |
 
-4. **生成日报**，只展示匹配主题的内容，确保**每条都有可点击的来源链接**
+**Step 2: 信号处理流水线**
 
-### 源状态追踪
+1. **去重** — 合并多源同一事件
+2. **聚类** — 按主题分组
+3. **交叉验证** — 跨层验证重大事件 → 计算 Confidence Score
+4. **Signal Scoring** — 按 7 维公式计算 Signal Score（0-100）
+5. **Business Impact** — 分析影响的企业/行业/岗位
+6. **Technical Impact** — 标记受影响的 technical domains
+7. **Market Impact** — 标记受影响的公司/市场
+8. **Action Recommendation** — 给出行动建议
+9. **Trend Detection** — 与近 7/30/90 天数据对比
 
-每次日报末尾附上所有数据源的状态：
-```
-✅ 正常 · ⚠️ 待配置 · ❌ 不可用
-```
+**Step 3: 生成日报**
 
-## 工具脚本
+按输出格式生成完整日报，每条内容必带来源链接。
 
-### filter_topics.py
-本 skill 目录 `scripts/filter_topics.py`
-按8大主题关键词过滤新闻JSON，输出分组markdown
+**来源链接格式：**
+- Twitter/X: `https://x.com/{screenName}/status/{id}`
+- GitHub: `https://github.com/{owner}/{repo}`
+- arXiv: `https://arxiv.org/abs/{id}`
+- Blog: 原始 URL
+- 政策: 官方公告 URL
 
-### 使用 filter_topics.py
-```bash
-# 配合 AIHOT API 使用
-UA=\"Mozilla/5.0 ...\"
-SINCE=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
-curl -sH \"User-Agent: $UA\" \\
-  \"https://aihot.virxact.com/api/public/items?mode=selected&since=$SINCE&take=50\" \\
-  | python3 ~/.hermes/skills/news/daily-intelligence/scripts/filter_topics.py
+**Step 4: 存档**
 
-# 只看统计
-python3 ~/.hermes/skills/news/daily-intelligence/scripts/filter_topics.py --format stats
-```
+将完整日报保存到 `~/wiki/20 queries/intel/daily-intelligence-YYYY-MM-DD.md`（YAML frontmatter + 正文），执行 `git commit/push`。
 
-## 用户偏好：数据源操作原则
+**Step 5: 交付**
 
-用户对数据源的修改请求（添加/移除/调整）遵循「保留内容，去除冗余」的默认原则：
+日报全文作为最终响应 deliver 给用户，末尾附上文件路径确认。
+
+---
+
+## 数据源操作原则
 
 - **不要整体移除一个数据源**，除非用户明确说「完全删除/永不使用」
-- 当用户说「移除/删除一个数据源」时，应**先澄清**：是要完全删除，还是保留内容但要剔除某些部分（结尾评论、总结摘要、作者署名等）
-- 再执行删除前，先看能否通过脚本/过滤规则保留内容、仅剔除用户不想要的部分
-- 🔥 **历史教训（两次踩坑）**：
-  1. **喷嚏图卦** — 用户说「删除喷嚏图卦」，实际是「保留内容，但不要结尾的泰伯评论/总结部分」 → 写 `fetch_dapenti.py` 过滤结尾而非删源
-  2. **泰伯早报** — 因为\"泰伯\"出现在喷嚏图卦结尾，误以为用户也要删除泰伯早报整体 → 写 `fetch_taibo.py` 恢复。注意：**\"删除A中的X部分\" ≠ \"删除整个X源\"**
-  3. **主题为空的排查**：如果发现融资/金融/股票等板块在日报中出现为空，可考虑：①适当放宽关键词（如增加“融资”、“投资”、“并购”等通用词）；②使用 `source-gathering` skill 进行补充采集；③检查数据源是否有财经类内容（如腾讯财经、雪球等）是否被误过滤。
+- 当用户说「移除/删除一个数据源」时，应**先澄清**：是要完全删除，还是保留内容但要剔除某些部分
+- 🔥 **历史教训：** 喷嚏图卦（删除结尾评论而非删源）、泰伯早报（误删后恢复）
 
-## 爬取注意事项（踩坑记录）
+---
 
-### CoinGecko 行情
-- 公开 API，无需 Key
-- `GET https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true`
+## 爬取注意事项
 
 ### AIHOT
 - 所有 API 调用必须带浏览器 UA，否则 403
-- 公开 API，无 token 要求
-- 限流 600 req/min/IP
+- 公开 API，无 token 要求，限流 600 req/min/IP
 
-### Foresight News
-- 网页有反爬限制，优先用 web_search 替代直接抓取
+### CoinGecko
+- 公开 API，无需 Key
+- `GET https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true`
 
-### 雪球 — WAF 保护（重要限制）
-
-雪球全站受**阿里云WAF**保护。即使配置了有效Cookie，直接调用API端点（`v4/statuses/user_timeline.json`）仍返回JavaScript验证挑战。此限制对境外服务器尤为明显。
-
-**可用功能：**
-- `XueqiuChannel.get_hot_posts()` — ✅ 热帖获取正常
-- web_search 缓存 — ⚠️ 偶尔可用（取决于网络）
-
-**不可用功能：**
-- 直接curl API — ❌ WAF阻挡
-- RSSHub镜像 — ❌ 同样被阻挡
-- 特定用户时间线 — ❌ 无法直接获取
-
-**雪球大V用户追踪方案详见 `references/xueqiu-user-tracking.md`**（13位大V的ID、脚本、cron均已配置）。
+### 雪球 — WAF 保护
+- 雪球全站受阿里云 WAF 保护，直接 curl API 被阻挡
+- 可用功能：`XueqiuChannel.get_hot_posts()` ✅
 
 ### 凤凰FM（小爱晚报）
-- 通过 JSONP API 获取，无需 Cookie
-- 必须带移动端 UA（Android Chrome）
-- 接口文档详见 `references/fenghuang-fm-api.md`
-- 返回格式：`j({...})`（注意是 `j` 不是 `BackData`）需去掉回调包装
-- **音频转文字**：下载 mp3 → faster-whisper base 模型转写 → 纳入日报\"国内新闻\"板块
-- **第二大脑存档**：转写结果保存到 `~/wiki/queries/fenghuang-xiaoi-YYYY-MM-DD.md`
-- 已集成到每日情报 cron（每天 18:00 自动执行）
-- **独立 Skill 已创建**：`fenghuang-fm`（含一键脚本 `scripts/fenghuang_fm_transcribe.sh`），完整工作流已发布至 GitHub
-  - 发布版：https://github.com/aiedwardai/fenghuang-fm-skill
-  - Skills 合集：https://github.com/aiedwardai/hermes-skills
-- 用户偏好：当用户要求某期小爱晚报\"全文\"时，输出完整转写文字，不做任何总结或压缩
-- 相关 skill：`audio-to-text`（通用音频转文字流程）
-- ⚠️ **JSONP 解析**：两个接口都返回 JSONP（`j({...})` 或 `BackData({...})`），必须先去掉回调包装再 `json.loads`。直接用 `json.load()` 会报 `JSONDecodeError: Expecting value`
+- 通过 JSONP API 获取，需移动端 UA
+- 详见独立 skill `fenghuang-fm`
 
-### 自动驾驶/智能网联汽车合规动态（数据源 #11）
-- **独立 cron 任务**（非 fenghuang-fm 的一部分），每天自动执行
-- **获取方式**：`web_search` 按 **6 个独立关键词** 分别搜索（limit=10）：
-  - `\"自动驾驶 合规\"`
-  - `\"智能网联 数据安全\"`
-  - `\"高精地图 审图\"`
-  - `\"车联网 数据安全\"`
-  - `\"汽车数据安全管理\"`
-- **主管部门聚焦**：自然资源部（地图/测绘/地理信息）、工信部（网络安全/数据安全）、交通运输部（道路运输/车辆安全）、国家网信办、公安部
-- **来源筛选标准**（严格按此过滤，仅保留以下 5 类）：
-  1. 政策文件发布/修订
-  2. 行业标准征求意见/发布
-  3. 监管部门的通知/问答/工作会议
-  4. 企业合规处罚/整改案例
-  5. 图商/地图审图相关动态
-- **输出格式**：按主题分类（🔬 科技 / 📊 金融），每条含标题+摘要+🔗 来源链接，末尾附本期重点关注矩阵
-- **存档路径**：`~/wiki/queries/automotive-compliance-daily-YYYY-MM-DD.md`（YAML frontmatter + 正文），然后 `git commit/push`
-- **背景知识库**：`~/wiki/queries/automotive-compliance-solution.md`
-  - 包含完整法规体系（11项核心法规）、合规架构、技术标准、工具链、客户案例
-  - 来源：宏图创展 PPT《自动驾驶合规解决方案（通用）》(2025/10/20)
-- **完整工作流**：详见 `references/automotive-compliance-daily-workflow.md`
+### 公众号/抖音
+- ❌ 猫笔刀、孟岩的区块链思考 — 微信封闭生态
+- ❌ 金岩石、李孔越 — 抖音封闭生态
 
-### 主题过滤器（Python伪代码）
-```python
-TOPICS = {
-    \"AI\": [\"ai\", \"人工智能\",\"llm\",\"gpt\",\"claude\",\"openai\",\"anthropic\",\"deepseek\",\"大模型\",\"机器学习\",\"agent\",\"智能体\",\"sam altman\",\"dario amodei\"],\n    \"Web3\": [\"web3\",\"去中心化\",\"defi\",\"nft\",\"元宇宙\",\"dao\",\"公链\",\"layer2\"],\n    \"区块链\": [\"区块链\",\"链上\",\"智能合约\",\"矿工\",\"挖矿\",\"evm\",\"共识\"],\n    \"比特币\": [\"比特币\",\"btc\",\"比特币etf\",\"gbtc\",\"减半\",\"ordinals\",\"铭文\"],\n    \"科技\": [\"科技\",\"芯片\",\"gpu\",\"nvidia\",\"半导体\",\"云计算\",\"卫星\",\"航天\",\"spacex\",\"机器人\",\"自动驾驶\",\"开源\"],\n    \"融资\": [\"融资\",\"投资\",\"vc\",\"风投\",\"估值\",\"ipo\",\"并购\",\"收购\",\"天使轮\"],\n    \"金融\": [\"金融\",\"银行\",\"证券\",\"基金\",\"美联储\",\"通胀\",\"货币政策\",\"监管\"],\n    \"股票\": [\"股票\",\"股市\",\"美股\",\"a股\",\"大盘\",\"指数\",\"财报\",\"回购\"],\n}
-\ndef filter_by_topic(items, topics=TOPICS):\n    for item in items:\n        text = (item.get(\"title\",\"\") + \" \" + item.get(\"summary\",\"\") + \" \" + item.get(\"content\",\"\")).lower()\n        matched = [t for t, keywords in topics.items() \n                   if any(kw in text for kw in keywords)]\n        if matched:\n            yield (item, matched)
-```
+---
 
 ## 公众号推送转换（剑闻）
-
-Cron 日报产出后，可自动转换为微信公众号「剑胆琴新」可用的 HTML 文章。
-
-### 工作流
-
-```
-Cron Job 18:00 → 原始日报送达飞书
-        ↓
-python3 ~/.hermes/scripts/cron_to_jianwen.py
-        ↓
-/tmp/jianwen-YYYY-MM-DD.html  ← 打开后全选复制，
-                                  公众号后台新建图文 → 粘贴 → 设 7:00 定时发布
-```
-
-### 标题格式
-
-自动生成：**剑闻 | {热点词1} · {热点词2} · {日期}**
-
-热点词从日报内容中自动提取，取匹配度最高的 1-2 个。**规则顺序即优先级**：时间敏感的重大事件优先，宽泛关键词排在后面。
-
-| 日报内容示例 | 自动标题 |
-|-------------|---------|
-| 苹果起诉OpenAI + Grok安全事件 | 剑闻 | 苹果起诉OpenAI · Grok安全事件 · 2026-07-13 |
-| 英伟达季度营收+GPT-5.6发布 | 剑闻 | GPT-5.6 · 英伟达 · 2026-07-11 |
-| 美联储决议 + BTC 暴跌 | 剑闻 | 美联储 · BTC · 2026-07-16 |
-
-**⚠️ 重要规则**：
-- 热点词前3条为时间敏感重大事件（苹果起诉、GPT-5.6、Grok安全事件），优先匹配
-- \"AI竞赛\"仅在明确竞争语境（超越/对决/军备）时触发，避免因OpenAI+Anthropic日常共现而每天重复出现
-- 取匹配的前2个不重复的热点词；如果只有1个匹配，则只用1个
-
-### 转换处理
-
-脚本执行 3 步转换：
-1. **萃取正文** — 跳过 cron 输出中的 skill 指令前缀和 agent 思考过程，从 `## Response` 后的真实内容起始（跳过 '数据充足'、'现在汇编' 等 preamble）
-2. **删除数据源状态** — 移除末尾的 `## 📊 数据源状态` 章节
-3. **HTML 格式化** — 公众号兼容内联样式（红色标题栏 `#c0392b`、链接 `#2980b9` 新标签打开、多级标题、表格列表适配）
-
-### ⚠️ 核心原则：内容忠实
-
-- **不要手动重新编辑日报内容** — 公众号版本必须基于 cron 原始输出自动转换，保持内容与原情报一致
-- 历史教训：手动重新拉数据和编辑导致公众号版本与情报原文**内容完全不同**（不同数据切片、不同的选题编辑）
-- `cron_to_jianwen.py` 只做**格式转换 + 标题组装 + 数据源状态删除**，不修改任何正文内容
-
-### 脚本位置
-
-**转换脚本：** `~/.hermes/scripts/cron_to_jianwen.py`
-**全自动发布脚本：** `~/.hermes/scripts/publish_jianwen.py`
 
 详见 `references/wechat-publishing.md`。
 
 ### 自动发布流水线
 
-每天 07:00 cron job `9abc671907ae`（no_agent 模式）自动执行 `publish_jianwen.py`，完成三步：
-1. **生成 HTML** — 调用 `cron_to_jianwen.py`，输出 `/tmp/jianwen-YYYY-MM-DD.html`
-2. **生成封面图** — Pillow 绘制 900×383 深色封面，带 剑闻 文字 + 热点词 + 日期
-3. **推送草稿** — `npm md2wechat sync-html` 将 HTML+封面推送到公众号草稿箱，deliver=\"origin\" 通知用户
-
-```bash
-# 手动模拟一次：
-source ~/.md2wechat/.env.jdqx && python3 ~/.hermes/scripts/publish_jianwen.py
-```
-
-### ⚠️ 自动发布限制
-
-草稿推送成功，但**无法自动发布** — 公众号为个人订阅号，API `freepublish/submit` 返回 `48001 api unauthorized`。用户需手动打开公众号后台 → 草稿箱 → 找到\"剑闻\" → 点击发布/设定时发布。
+每天 20:30 cron job `9abc671907ae`（no_agent 模式）自动执行 `publish_jianwen.py`：
+1. 生成 HTML — 调用 `cron_to_jianwen.py`
+2. 生成封面图 — Pillow 绘制 900×383
+3. 推送草稿 — `npm md2wechat sync-html` 推送到剑胆琴新
+4. WordPress 同步发布到 token2x.com（JianNews 分类）
 
 ### 已实现的优化
 
-- ✅ **日报自动存入第二大脑 Wiki** — Cron job 18:00 的 prompt 末尾包含 wiki 存档指令：生成日报后将完整内容（不含数据源状态）保存到 `~/wiki/queries/daily-intelligence-YYYY-MM-DD.md`（YAML frontmatter + 正文），并执行 git commit/push
+- ✅ 日报自动存入第二大脑 Wiki：`~/wiki/20 queries/intel/daily-intelligence-YYYY-MM-DD.md`
+- ✅ WordPress 自动发布：token2x.com → JianNews 分类
+- ✅ 剑胆琴新公众号草稿推送
+- ✅ 剑闻格式自动转换：cron_to_jianwen.py → 热点词标题 + 公众号兼容 HTML
 
-### Cron 故障恢复
+---
 
-LLM 驱动型 cron job（每日情报、arXiv、SPCX）可能因模型 provider 超时或 `cron_mode: deny` 审批拦截而失败。此时按 `references/cron-manual-fallback.md` 中的并行 delegate_task 流程手动执行：
+## Cron 配置
 
-```text
-批次 A: CoinGecko + AIHOT (curl)
-批次 B: Tencent News (news-aggregator-skill fetch_news.py --source tencent)
-批次 C: Twitter/X (web_search)
-批次 D: 喷嚏图卦 + 泰伯早报 (fetch_*.py)
+```bash
+hermes cron add \
+  --name "每日全球AI科技实时追踪" \
+  --schedule "0 18 * * *" \
+  --skills "ai-signal-intelligence,aihot" \
+  --prompt "执行每日 AI Intelligence 情报汇编，使用 ai-signal-intelligence v3.2 skill，按 Signal Score 评分 + 7 维分析 + Action Recommendation 输出日报。" \
+  --deliver origin
 ```
 
-详见 `references/cron-manual-fallback.md`。
+## 历史版本与提示词恢复
 
-### 未来优化方向
-- 增加更多 Twitter/X 关注账号
-- 日报自动存入第二大脑 Wikidata
+用户问「v1.5.1 / v3.0 的提示词或版本」时不要凭记忆拼：
 
-## 重要限制
+- **当前 cron 提示词**：读 `~/.hermes/cron/jobs.json` 里对应 job 的 `prompt` 字段。
+- **历史 cron 提示词**：`~/.hermes/state-snapshots/*/cron/jobs.json`（升级前自动快照，保留当时的原样 prompt；v1.5.1 提示词即由此取得）。
+- **历史 skill 全文**：`~/.hermes/skills/.curator_backups/*/skills.tar.gz`（按日期取旧版）+ `references/daily-intelligence-v3.0.md`（v3.0 存档）。
+- **GitHub 归档**：`aiedwardai/daily-intelligence-skill`（GitHub 独立演进线 v1.6.0，与本地 v3.x 结构不同）。
+- 注意 cron prompt 可能滞后于 skill 版本（prompt 仍写 v3.0、实际加载 v3.1）：回答时区分「提示词文本」与「实际加载的 skill」。
 
-- ❌ 公众号（猫笔刀、孟岩的区块链思考）：微信封闭生态，无法获取
-- ❌ 抖音（金岩石、李孔越）：抖音封闭生态，无法获取
-- ⚠️ 国际新闻仅在重大科技/AI事件时关注
+## 更新日志
 
-## 数据源配置审计
-
-当用户问「还有哪些需要配置/需要Cookie/需要API Key」时，执行以下审计流程，输出完整状态总表：
-
-### 审计步骤
-
-1. **Agent Reach 渠道状态** — `agent-reach doctor` 查看所有渠道的可用性
-2. **各 Skill API/Key 需求** — 对 daily-intelligence 集成的每个子 skill，grep 其 SKILL.md 中 api.key/api_key/API_KEY 等关键字。公开 API（CoinGecko、AIHOT）标注为无需 Key
-3. **环境变量检查** — `cat ~/.hermes/.env` 查看已配置的 token/key
-4. **Agent Reach 可选渠道检查** — `agent-reach install --channels <name> --dry-run` 查看安装方式和代理需求
-
-### 输出格式
-
-按三级分类呈现给用户：
-
-| 状态 | 含义 |
-|------|------|
-| ✅ 已就绪 | 无需任何配置，直接可用 |
-| ⚠️ 可加装 | 可选渠道，知道安装命令和配置需求 |
-| ❌ 不可用 | 平台封闭（公众号/抖音）或无此 skill |
-
-### Agent Reach 可选渠道配置需求速查
-| references/wechat-publishing.md — 剑闻生成 HTML 并推送公众号的完整工作流 |
-| references/ppt-to-markdown-extraction.md — PPT/PPTX 全文提取为 Markdown 的工作流 |
-- `references/fenghuang-fm-api.md` — 凤凰FM API 接口文档（小爱晚报节目，pid=456498）
-- `references/channel-cookie-setup.md` — 各渠道无浏览器 Cookie 配置脚本
-
-| 渠道 | 安装 | Cookie/Key | 代理 |
-|------|------|-----------|------|
-| Reddit | `agent-reach install --channels reddit` | 无 | 无需 |
-| 雪球 | `agent-reach install --channels xueqiu` | 无 | 无需 |
-| 小红书 | `agent-reach install --channels xiaohongshu` | xhs-cookies | 无需 |
-| 小宇宙 | `agent-reach install --channels xiaoyuzhou` | 无 | 无需 |
-| B站 | `agent-reach install --channels bilibili` | 无 | 需代理 |
-| LinkedIn | `agent-reach install --channels linkedin` | 需要登录 | 无需 |
-
-## 变更日志
-
-### v1.6.0（2026-10-02）
-
-本机（Muse VM）增量，均已实测：
-
-- **X 名单扩至 68 个**：新增 @JensenHuang（媒体交叉核验为本人）、@karpathy、@emollick 等 20 个；用户原清单里的 "@emollick（Emad）" 实为 Ethan Mollick，Emad Mostaque 按 @EMostaque 单列。
-- **X 直拉打通**：装 GitHub 版 `Panniantong/agent-reach`（注意 PyPI 同名包无 twitter 渠道）+ twitter-cli 0.8.5（pipx 路线失败后直装 venv）；`agent-reach configure twitter-cookies` 配置 Cookie，twitter 命令还需 `source ~/.agent-reach/twitter.env`（TWITTER_AUTH_TOKEN/CT0）。2026-10-02 实测 67 账号全拉、48h 内 49 个有动态共 154 条，日报 X 板块从此用原帖直链，不再公开搜索兜底。⚠️ 数据中心 IP + 主号 Cookie 有风控风险，建议小号；文档建议见 `references/channel-cookie-setup.md`。
-- **Reddit 打通**：rdt-cli 装入同一 venv，凭据按 manual 格式写 `~/.config/rdt-cli/credential.json`（600），账号 ActivityCorrect2434；`rdt search` 实测可用。坑：本机 `no_proxy` 含 `[::1]` 等括号 IPv6 会让 rdt 的 httpx 崩溃，跑前清成 `localhost,127.0.0.1`。
-- **新增聚合源**：news-aggregator-skill 新增 `coindesk` / `cointelegraph` 两源（RSS：coindesk.com/arc/outboundfeeds/rss/、cointelegraph.com/rss），日报默认清单包含，服务「₿ 比特币·宏观」板块。（该改动在 news-aggregator-skill 仓库内，本 skill 只登记。）
-- **公众号流水线验证**：md2wechat-lite AI 模式（autumn-warm）+ 封面，连续两日把「今日AI速览」推入「剑胆琴新」草稿箱并核验；个人订阅号仍需后台手动发表。
-
-### v1.5.2（2026-10-01）
-
-- **删除数据源**：雪球、tencent-news-cli（腾讯新闻统一走 `fetch_news.py --source tencent`）；cron 手动兜底文档已同步。
-- **装齐依赖**：clone 本 skill；补装 news-aggregator-skill（44+ 源）与 md2wechat-lite；AIHOT 公开 API 实测可用。
-- 首次全流程试跑成功，日报落盘。
+- v3.2 (2026-11-10): skill 更名为 **ai-signal-intelligence**（原名 daily-intelligence 保留为 alias），明确定位为「采集 + 分析 + 决策」引擎而非日报聚合器。
+- v3.1 (2026-07-30): 升级为 Signal Intelligence Engine。新增 Signal Score 0-100 评分公式、Confidence Score、Business/Technical/Market Impact 分析、Action Recommendation、Trend Detection、Event Correlation、Top 5 Action Items、Tomorrow Watchlist。
+- v3.0 (2026-07-29): 全面升级为 AI Native Daily Intelligence System。8 层信息源，S/A/B/C 信号评分体系。
+- v1.5.1 (2026-07-24): 修复 wiki 写入路径
+- v1.0.0 (2026-06-09): 初始版本
