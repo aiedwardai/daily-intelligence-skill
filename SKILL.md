@@ -458,6 +458,46 @@ GitHub Trending / 新发布 / 新框架
 
 ---
 
+## 排版规范（md2wechat 秋色 autumn-warm）
+
+日报对外发布统一使用 md2wechat-lite 的 **autumn-warm（秋日暖橙）** AI 排版，这是唯一允许的视觉风格，不再使用红蓝配色。
+
+### 配色表
+
+| 元素 | 色值 |
+|---|---|
+| 页面底色 | `#FDF6EC` |
+| 主卡片底 | `#FFFDF9` |
+| 正文 | `#4A413D` |
+| 标题 / h2 / 强调 | `#D97758` |
+| h3 / 次强调 | `#C06B4D` |
+| 分隔线 / 表格边框 | `#EADFD2`（th 底 `#FAF3EA`） |
+| 次要文字 | `#A8988A` / `#B9AAA0` |
+
+### 硬性要求
+
+1. **纯内联样式**，禁止 `<style>` 标签（微信公众号会丢弃）
+2. 外层必须用 `<section>` 或 `<div>` 主容器包裹（微信丢弃 body 样式）
+3. **每个 `<p>` 显式 `color:#4a413d`**（微信会重置 p 颜色）
+4. 标题层级：h1 全文一次（`#4A413D`）→ h2 章节（`#D97758`，居中）→ h3 条目（`#C06B4D` + 左侧 `#E8C4A8` 竖线）
+5. 表格：th 底 `#FAF3EA`、边框 `#EADFD2`、td 文字 `#4A413D`
+6. 封面 900×383 PNG，秋色（底 `#FDF6EC`、主色 `#D97758`、字 `#4A413D`）
+
+### 落地方式
+
+- **WordPress（token2x.com）**：post content 必须直接提交这份秋色 HTML，不能提交裸 markdown 转出的无样式 HTML
+- **公众号（剑胆琴新）**：`cron_to_jianwen.py` 的 STYLES 已内置同一套秋色；也可走 md2wechat-lite 的 `draft/add`
+
+### 发布前自检
+
+```bash
+grep -c '<style' out.html          # 必须为 0
+grep -c 'color:#4a413d' out.html   # 应接近 <p> 数量
+grep -c '#d97758' out.html         # 应 > 0
+```
+
+---
+
 ## 公众号推送转换（剑闻）
 
 详见 `references/wechat-publishing.md`。
